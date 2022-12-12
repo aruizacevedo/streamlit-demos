@@ -1,2 +1,5 @@
 streamlit
 plotly
+pandas-profiling
+streamlit-pandas-profiling
+Jinja2
