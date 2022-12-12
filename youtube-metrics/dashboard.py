@@ -23,6 +23,16 @@ def style_positive(v, props=''):
         pass    
 
 
+def audience_simple(country):
+    """Show top represented countries"""
+    if country == 'US':
+        return 'USA'
+    elif country == 'IN':
+        return 'India'
+    else:
+        return 'Other'
+
+
 @st.cache
 def load_data():
     """Loads 4 dataframes and does light feature engineering"""
@@ -55,6 +65,7 @@ def load_data():
         .assign(Date = lambda x: pd.to_datetime(x['Date']))
     )
     return df_agg, df_agg_sub, df_comments, df_time
+
 
 # Load dataframes
 df_agg, df_agg_sub, df_comments, df_time = load_data()
@@ -99,8 +110,6 @@ views_cumulative = views_days.loc[:,['days_published','median_views','80pct_view
 views_cumulative.loc[:,['median_views','80pct_views','20pct_views']] = views_cumulative.loc[:,['median_views','80pct_views','20pct_views']].cumsum()
 
 
-
-
 # Engineer data
 # - What metrics will be relevant?
 # - Difference from baseline
@@ -143,18 +152,62 @@ if add_sidebar == 'Aggregate Metrics':
     df_agg_diff_final = df_agg_diff.loc[:,['Video title','Publish_date','Views','Likes','Subscribers','Shares','Comments added','RPM(USD)','Average % viewed',
                              'Avg_duration_sec', 'Engagement_ratio','Views / sub gained']]
     
-    df_agg_numeric_lst = df_agg_diff_final.median().index.tolist()
+    df_agg_numeric_lst = df_agg_diff_final.median(numeric_only=True).index.tolist()
+
     df_to_pct = {}
     for i in df_agg_numeric_lst:
         df_to_pct[i] = '{:.1%}'.format
     
-    st.dataframe(df_agg_diff_final.style.hide().applymap(style_negative, props='color:red;').applymap(style_positive, props='color:green;').format(df_to_pct))
+    st.dataframe(
+        df_agg_diff_final.style.hide().applymap(style_negative, props='color:red;').applymap(style_positive, props='color:green;').format(df_to_pct))
 
 
 
 
 if add_sidebar == 'Individual Video Analysis':
-    pass
+
+    videos = tuple(df_agg['Video title'])
+    st.write("Individual Video Performance")
+    video_select = st.selectbox('Pick a Video:', videos)
+    
+    agg_filtered = df_agg[df_agg['Video title'] == video_select]
+    agg_sub_filtered = df_agg_sub[df_agg_sub['Video Title'] == video_select]
+    agg_sub_filtered['Country'] = agg_sub_filtered['Country Code'].apply(audience_simple)
+    agg_sub_filtered.sort_values('Is Subscribed', inplace= True)   
+    
+    fig = px.bar(agg_sub_filtered, x ='Views', y='Is Subscribed', color ='Country', orientation ='h')
+    
+    #order axis 
+    st.plotly_chart(fig)
+    
+    agg_time_filtered = df_time_diff[df_time_diff['Video Title'] == video_select]
+    first_30 = agg_time_filtered[agg_time_filtered['days_published'].between(0,30)]
+    first_30 = first_30.sort_values('days_published')
+    
+    
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['20pct_views'],
+                    mode='lines',
+                    name='20th percentile', line=dict(color='purple', dash ='dash')))
+    fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['median_views'],
+                        mode='lines',
+                        name='50th percentile', line=dict(color='black', dash ='dash')))
+    fig2.add_trace(go.Scatter(x=views_cumulative['days_published'], y=views_cumulative['80pct_views'],
+                        mode='lines', 
+                        name='80th percentile', line=dict(color='royalblue', dash ='dash')))
+    fig2.add_trace(go.Scatter(x=first_30['days_published'], y=first_30['Views'].cumsum(),
+                        mode='lines', 
+                        name='Current Video' ,line=dict(color='firebrick',width=8)))
+        
+    fig2.update_layout(title='View comparison first 30 days',
+                   xaxis_title='Days Since Published',
+                   yaxis_title='Cumulative views')
+    
+    st.plotly_chart(fig2)
+
+
+
+    
 
 
 
