@@ -13,7 +13,6 @@ from datetime import datetime
 @st.cache
 def load_data():
     """Loads 4 dataframes and does light feature engineering"""
-
     # Video-level
     df_agg = (
         pd.read_csv(
@@ -33,23 +32,19 @@ def load_data():
     df_agg['Engagement_ratio'] =  (df_agg['Comments added'] + df_agg['Shares'] +df_agg['Dislikes'] + df_agg['Likes']) /df_agg.Views
     df_agg['Views / sub gained'] = df_agg['Views'] / df_agg['Subscribers gained']
     df_agg.sort_values('Video publish time', ascending = False, inplace = True)    
-
     # Subscriber-level
     df_agg_sub = pd.read_csv("youtube-metrics/data/Aggregated_Metrics_By_Country_And_Subscriber_Status.csv")
-
     # Comments
     df_comments = pd.read_csv("youtube-metrics/data/All_Comments_Final.csv")
-
     # Performance Time Series
     df_time = (
         pd.read_csv("youtube-metrics/data/Video_Performance_Over_Time.csv")
         .assign(Date = lambda x: pd.to_datetime(x['Date']))
     )
-
     return df_agg, df_agg_sub, df_comments, df_time
 
+df_agg, df_agg_sub, df_comments, df_time = load_data()
 
-load_data()
 
 
 
@@ -61,5 +56,20 @@ load_data()
 # - Percent change by video
 
 # Build dashboard
+###############################################################################
+#Start building Streamlit App
+###############################################################################
+
+add_sidebar = st.sidebar.selectbox('Aggregate or Individual Video', ('Aggregate Metrics', 'Individual Video Analysis'))
+
+if add_sidebar == 'Aggregate Metrics':
+    pass
+
+if add_sidebar == 'Individual Video Analysis':
+    pass
+
+
+
+
 # - Total picture
 # - Individual video
