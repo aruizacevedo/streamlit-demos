@@ -166,8 +166,9 @@ if add_sidebar == 'Aggregate Metrics':
 
 if add_sidebar == 'Individual Video Analysis':
 
-    videos = tuple(df_agg['Video title'])
     st.write("Individual Video Performance")
+
+    videos = tuple(df_agg['Video title'])
     video_select = st.selectbox('Pick a Video:', videos)
     
     agg_filtered = df_agg[df_agg['Video title'] == video_select]
