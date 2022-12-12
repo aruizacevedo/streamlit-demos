@@ -3,6 +3,8 @@
 `conda create -n streamlit-demos python=3.8`
 
 
+## Community Cloud
+https://streamlit.io/cloud
 
 
 #### References
