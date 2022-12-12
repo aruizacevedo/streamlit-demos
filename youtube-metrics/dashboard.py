@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 # Load data
-
+@st.cache
 def load_data():
     """Loads 4 dataframes and does light feature engineering"""
 
@@ -45,10 +45,11 @@ def load_data():
         pd.read_csv("youtube-metrics/data/Video_Performance_Over_Time.csv")
         .assign(Date = lambda x: pd.to_datetime(x['Date']))
     )
-    
+
     return df_agg, df_agg_sub, df_comments, df_time
 
 
+load_data()
 
 
 
