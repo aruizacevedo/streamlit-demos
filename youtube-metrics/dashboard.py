@@ -132,7 +132,8 @@ if add_sidebar == 'Aggregate Metrics':
     for i in metric_medians6mo.index:
         with columns[count]:
             delta = (metric_medians6mo[i] - metric_medians12mo[i])/metric_medians12mo[i]
-            st.metric(label= i, value = round(metric_medians6mo[i],1), delta = "{:.2%}".format(delta))
+            st.metric(label= i, value = round(metric_medians6mo[i], 1), delta = "{:.2%}".format(delta))
+            # st.metric(label = i, value = round(metric_medians6mo[i], 1), delta = f"{delta:.2%}")
             count += 1
             if count >= 5:
                 count = 0
