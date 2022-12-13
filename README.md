@@ -11,3 +11,6 @@ https://streamlit.io/cloud
 - https://blog.streamlit.io/how-to-master-streamlit-for-data-science/
 - https://docs.streamlit.io/library/cheatsheet
 - https://docs.streamlit.io/
+
+
+Adding a new line to test whether I'm able to commit from Gitpod
